@@ -73,10 +73,18 @@ export default React.createClass({
 
                     {this.props.children}
 
-                    {/* {{> footer }} */}
-
+                    <div className="footer">
+                        <div className="pull-right">
+                            10GB of
+                            <strong>250GB</strong>
+                            Free.
+                        </div>
+                        <div>
+                            <strong>Copyright</strong>
+                            Example Company &copy; 2014-2015
+                        </div>
+                    </div>
                 </div>
-
             </div>
         )
     }
