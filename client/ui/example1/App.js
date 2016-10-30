@@ -27,6 +27,12 @@ export default React.createClass({
                             <span className="nav-label">Repos</span>
                         </NavLink>
                     </li>
+                    <li>
+                        <NavLink to="/matrix">
+                            <i className="fa fa-diamond"></i>
+                            <span className="nav-label">Matrix</span>
+                        </NavLink>
+                    </li>
                 </Navigation>
 
                 <div id="page-wrapper" className="gray-bg">

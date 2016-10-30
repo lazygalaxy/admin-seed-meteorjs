@@ -9,6 +9,7 @@ import Home from './ui/example1/Home';
 import About from './ui/example1/About';
 import Repo from './ui/example1/Repo';
 import Repos from './ui/example1/Repos';
+import Matrix from './ui/example1/Matrix';
 
 Meteor.startup(() => {
     render((
@@ -19,6 +20,7 @@ Meteor.startup(() => {
                 <Route path="/repos" component={Repos}>
                     <Route path="/repos/:userName/:repoName" component={Repo}/>
                 </Route>
+                <Route path="/matrix" component={Matrix}/>
             </Route>
         </Router>
     ), document.getElementById('render-target'));
