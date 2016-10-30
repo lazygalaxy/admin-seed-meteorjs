@@ -6,10 +6,10 @@ export default React.createClass({
         return (
             <Page title='About'>
                 <h1>
-                    Welcome in INSPINIA Meteor SeedProject
+                    Welcome to the LazyGalaxy admin seed project.
                 </h1>
                 <small>
-                    It is an application skeleton for a typical Meteor web app. You can use it to quickly bootstrap your webapp projects and dev environment for these projects.
+                    Based on Meteor and React.
                 </small>
             </Page>
         )

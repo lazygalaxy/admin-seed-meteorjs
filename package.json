@@ -1,5 +1,5 @@
 {
-  "name": "seed-meteorjs",
+  "name": "seed-admin-meteorjs",
   "private": true,
   "scripts": {
     "start": "meteor run"
