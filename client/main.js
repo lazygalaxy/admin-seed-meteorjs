@@ -4,11 +4,11 @@ import {render} from 'react-dom';
 import {Router, Route, browserHistory, IndexRoute} from 'react-router'
 
 //import recipe components
-import App from './ui/App';
-import Home from './ui/Home';
-import About from './ui/About';
-import Repo from './ui/Repo';
-import Repos from './ui/Repos';
+import App from './ui/example1/App';
+import Home from './ui/example1/Home';
+import About from './ui/example1/About';
+import Repo from './ui/example1/Repo';
+import Repos from './ui/example1/Repos';
 
 Meteor.startup(() => {
     render((

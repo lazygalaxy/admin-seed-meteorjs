@@ -1,12 +1,12 @@
 import React from 'react'
 
-export default React.createClass({
+export default class Page extends React.Component {
     render() {
         return (
             <div>
                 <div className="row wrapper border-bottom white-bg page-heading">
                     <div className="col-lg-12">
-                        <h2>About</h2>
+                        <h2>{this.props.title}</h2>
                     </div>
                 </div>
 
@@ -14,12 +14,7 @@ export default React.createClass({
                     <div className="row">
                         <div className="col-lg-12">
                             <div className="text-center m-t-lg">
-                                <h1>
-                                    Welcome in INSPINIA Meteor SeedProject
-                                </h1>
-                                <small>
-                                    It is an application skeleton for a typical Meteor web app. You can use it to quickly bootstrap your webapp projects and dev environment for these projects.
-                                </small>
+                                {this.props.children}
                             </div>
                         </div>
                     </div>
@@ -27,4 +22,8 @@ export default React.createClass({
             </div>
         )
     }
-})
+}
+
+Page.propTypes = {
+    title: React.PropTypes.string
+};
