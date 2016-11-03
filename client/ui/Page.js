@@ -13,9 +13,7 @@ export default class Page extends React.Component {
                 <div className="wrapper wrapper-content animated fadeInRight">
                     <div className="row">
                         <div className="col-lg-12">
-                            <div className="text-center m-t-lg">
-                                {this.props.children}
-                            </div>
+                            {this.props.children}
                         </div>
                     </div>
                 </div>
