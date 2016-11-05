@@ -9,6 +9,7 @@ import Page from '../Page';
 
 //collections
 import {MemberCollection} from '../../../imports/api/collections';
+import {ScoreCollection} from '../../../imports/api/collections';
 import {SystemCollection} from '../../../imports/api/collections';
 import {TeamCollection} from '../../../imports/api/collections';
 
@@ -28,19 +29,23 @@ class Matrix extends React.Component {
     _renderTables() {
         return this.props.teams.map((team) => {
             return (
-                <div key={team._id}>
-                    <h2>{team.label}</h2>
-                    <table className="table table-striped">
-                        <thead>
-                            <tr>
-                                <th></th>
-                                {this._renderTableHeaders(team)}
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {this._renderTableRows(team)}
-                        </tbody>
-                    </table>
+                <div key={team._id} className="ibox float-e-margins">
+                    <div className="ibox-title">
+                        <h5>{team.label}</h5>
+                    </div>
+                    <div className="ibox-content">
+                        <table className="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    {this._renderTableHeaders(team)}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {this._renderTableRows(team)}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             );
         });
@@ -60,16 +65,18 @@ class Matrix extends React.Component {
         return filteredMembers.map((member) => {
             return (
                 <tr key={member._id}>
-                    <td>1</td>
-                    <td>
-                        <span className="line">5,3,2,-1,-3,-2,2,3,5,2</span>
-                    </td>
                     <td>{member.name}</td>
-                    <td className="text-navy">
-                        <i className="fa fa-level-up"></i>
-                        40%
-                    </td>
+                    {this._renderScores(team, member)}
                 </tr>
+            );
+        });
+    }
+
+    _renderScores(team, member) {
+        let filteredSystems = this.props.systems.filter(system => system.teamId == team._id);
+        return filteredSystems.map((system) => {
+            return (
+                <td key={system._id}>{this.props.scoreObj.getScore(member._id, system._id)}</td>
             );
         });
     }
@@ -77,35 +84,54 @@ class Matrix extends React.Component {
     render() {
         return (
             <Page title='Matrix'>
-                <div className="ibox float-e-margins">
-                    <div className="ibox-title">
-                        <h5>Striped Table</h5>
-                    </div>
-                    <div className="ibox-content">
-                        {this._renderTables()}
-                    </div>
-                </div>
+                {this._renderTables()}
             </Page>
         )
     }
 }
 
+class ScoreObj {
+    constructor(scores) {
+        this.scoreMap = new Map();
+
+        scores.map((score) => {
+            if (!this.scoreMap.get(score.memberId)) {
+                this.scoreMap.set(score.memberId, new Map());
+            }
+            this.scoreMap.get(score.memberId).set(score.systemId, score.value);
+        });
+    }
+
+    getScore(memberId, systemId) {
+        if (this.scoreMap.get(memberId) && this.scoreMap.get(memberId).get(systemId)) {
+            return this.scoreMap.get(memberId).get(systemId);
+        }
+        return '-';
+    }
+}
+
 export default createContainer(() => {
-    Meteor.subscribe('systems');
     Meteor.subscribe('members');
+    Meteor.subscribe('systems');
+    Meteor.subscribe('scores');
     Meteor.subscribe('teams');
 
-    return {systems: SystemCollection.find({}, {
+    return {
+        scoreObj: new ScoreObj(ScoreCollection.find({}).fetch()),
+        systems: SystemCollection.find({}, {
             sort: {
                 label: 1
             }
-        }).fetch(), members: MemberCollection.find({}, {
+        }).fetch(),
+        members: MemberCollection.find({}, {
             sort: {
                 name: 1
             }
-        }).fetch(), teams: TeamCollection.find({}, {
+        }).fetch(),
+        teams: TeamCollection.find({}, {
             sort: {
                 label: 1
             }
-        }).fetch()};
+        }).fetch()
+    };
 }, Matrix);

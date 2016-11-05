@@ -1,20 +1,10 @@
-import {SystemCollection} from '../imports/api/collections';
 import {MemberCollection} from '../imports/api/collections';
+import {ScoreCollection} from '../imports/api/collections';
+import {SystemCollection} from '../imports/api/collections';
 import {TeamCollection} from '../imports/api/collections';
 
 Meteor.startup(function() {
-    var teamAssets = Assets.getText('teams.csv').split(/\r\n|\n/);
-    console.info('updating teams: ' + teamAssets.length);
-    teamAssets.forEach(function(entry) {
-        if (entry) {
-            var fields = entry.split(';');
-            TeamCollection.upsert({
-                _id: fields[0]
-            }, {label: fields[1]});
-        }
-    });
-
-    var memberAssets = Assets.getText('members.csv').split(/\r\n|\n/);
+    var memberAssets = Assets.getText('vb_members.csv').split(/\r\n|\n/);
     console.info('updating members: ' + memberAssets.length);
     memberAssets.forEach(function(entry) {
         if (entry) {
@@ -29,7 +19,22 @@ Meteor.startup(function() {
         }
     });
 
-    var systemAssets = Assets.getText('systems.csv').split(/\r\n|\n/);
+    var scoreAssets = Assets.getText('vb_scores.csv').split(/\r\n|\n/);
+    console.info('updating scores: ' + scoreAssets.length);
+    scoreAssets.forEach(function(entry) {
+        if (entry) {
+            var fields = entry.split(';');
+            ScoreCollection.upsert({
+                _id: fields[0] + '_' + fields[1]
+            }, {
+                systemId: fields[0],
+                memberId: fields[1],
+                value: fields[2]
+            });
+        }
+    });
+
+    var systemAssets = Assets.getText('vb_systems.csv').split(/\r\n|\n/);
     console.info('updating systems: ' + systemAssets.length);
     systemAssets.forEach(function(entry) {
         if (entry) {
@@ -40,6 +45,17 @@ Meteor.startup(function() {
                 label: fields[1],
                 teamId: fields[2]
             });
+        }
+    });
+
+    var teamAssets = Assets.getText('vb_teams.csv').split(/\r\n|\n/);
+    console.info('updating teams: ' + teamAssets.length);
+    teamAssets.forEach(function(entry) {
+        if (entry) {
+            var fields = entry.split(';');
+            TeamCollection.upsert({
+                _id: fields[0]
+            }, {label: fields[1]});
         }
     });
 });
