@@ -1,5 +1,6 @@
 //react
 import React from 'react';
+import 'jquery-knob'
 
 //meteor
 import {createContainer} from 'meteor/react-meteor-data';
@@ -12,18 +13,6 @@ import {MemberCollection} from '../../../imports/api/collections';
 import {ScoreCollection} from '../../../imports/api/collections';
 import {SystemCollection} from '../../../imports/api/collections';
 import {TeamCollection} from '../../../imports/api/collections';
-
-$(function() {
-    // Options for peity charts
-    $("span.pie").peity("pie", {
-        fill: ['#1ab394', '#d7d7d7', '#ffffff']
-    });
-
-    $(".line").peity("line", {
-        fill: '#1ab394',
-        stroke: '#169c81'
-    });
-});
 
 class Matrix extends React.Component {
     _renderTables() {
@@ -75,11 +64,29 @@ class Matrix extends React.Component {
     _renderScores(team, member) {
         let filteredSystems = this.props.systems.filter(system => system.teamId == team._id);
         return filteredSystems.map((system) => {
+            let combinedId = system._id + '.' + member._id;
+            let scoreValue = this.props.scoreObj.getScore(member._id, system._id);
+
             return (
-                <td key={system._id}>{this.props.scoreObj.getScore(member._id, system._id)}</td>
+                <td key={combinedId}>
+                    <input className="dial" type="text" data-memberid={member._id} data-systemid={system._id} value={scoreValue} onChange={this._nothing.bind(this)} data-fgColor="#1AB394" data-min="0" data-max="5" data-width="65" data-height="65"/>
+                </td>
             );
         });
     }
+
+    componentDidUpdate() {
+        $(".dial").knob({
+            'release': function(v) {
+                let memberId = this.$.attr('data-memberid');
+                let systemId = this.$.attr('data-systemid');
+                console.info('hello ' + memberId + ' ' + systemId + ' ' + v);
+            }
+        });
+    }
+
+    //used for input to avoid react warnings
+    _nothing() {}
 
     render() {
         return (
@@ -106,7 +113,7 @@ class ScoreObj {
         if (this.scoreMap.get(memberId) && this.scoreMap.get(memberId).get(systemId)) {
             return this.scoreMap.get(memberId).get(systemId);
         }
-        return '-';
+        return 0;
     }
 }
 
