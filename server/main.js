@@ -1,3 +1,5 @@
+import {check} from 'meteor/check';
+
 import {MemberCollection} from '../imports/api/collections';
 import {ScoreCollection} from '../imports/api/collections';
 import {SystemCollection} from '../imports/api/collections';
@@ -45,4 +47,21 @@ Meteor.startup(() => {
             }
         });
     });
+});
+
+//meteor methods
+Meteor.methods({
+    'score.update' (systemId, memberId, score) {
+        check(systemId, String);
+        check(memberId, String);
+        check(score, Number);
+
+        ScoreCollection.upsert({
+            _id: systemId + '_' + memberId
+        }, {
+            systemId: systemId,
+            memberId: memberId,
+            value: score
+        });
+    }
 });

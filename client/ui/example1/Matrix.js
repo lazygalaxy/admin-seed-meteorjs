@@ -1,13 +1,16 @@
 //react
 import React from 'react';
+import cx from 'react-classset'
+
+//react components
+import Page from '../Page';
+
+// other libs
 import 'jquery-knob'
 import 'bootstrap-touchspin'
 
 //meteor
 import {createContainer} from 'meteor/react-meteor-data';
-
-//react components
-import Page from '../Page';
 
 //collections
 import {MemberCollection} from '../../../imports/api/collections';
@@ -43,21 +46,47 @@ class Matrix extends React.Component {
                         </label>
                     </div>
                 </div>
-
-                {this._renderTables()}
+                <div className="tabs-container">
+                    <ul className="nav nav-tabs">
+                        {this._renderTabTitles()}
+                    </ul>
+                    <div className="tab-content">
+                        {this._renderTabContents()}
+                    </div>
+                </div>
             </div>
         )
 
     }
 
-    _renderTables() {
+    _renderTabTitles() {
+        let index = 0;
         return this.props.teams.map((team) => {
+            let attr = [];
+            if (index++ == 0) {
+                attr.push('active');
+            }
+            let hrefValue = '#' + team._id;
+
             return (
-                <div key={team._id} className="ibox float-e-margins">
-                    <div className="ibox-title">
-                        <h5>{team.label}</h5>
-                    </div>
-                    <div className="ibox-content">
+                <li key={team._id} className={cx(...attr)}>
+                    <a data-toggle="tab" href={hrefValue}>{team.label}</a>
+                </li>
+            );
+        });
+    }
+
+    _renderTabContents() {
+        let index = 0;
+        return this.props.teams.map((team) => {
+            let attr = ['tab-pane'];
+            if (index++ == 0) {
+                attr.push('active');
+            }
+
+            return (
+                <div key={team._id} id={team._id} className={cx(...attr)}>
+                    <div className="panel-body">
                         <table className="table table-striped">
                             <thead>
                                 <tr>
@@ -101,7 +130,7 @@ class Matrix extends React.Component {
 
         return filteredSystems.map((system) => {
             let combinedId = system._id + '.' + member._id;
-            let scoreValue = this.props.scoreObj.getScore(member._id, system._id);
+            let scoreValue = this.props.scoreObj.getScore(system._id, member._id);
 
             return (
                 <td key={combinedId}>
@@ -113,11 +142,11 @@ class Matrix extends React.Component {
 
     componentDidUpdate() {
         $(".touchspin").TouchSpin({min: 0, max: 5, buttondown_class: 'btn btn-white', buttonup_class: 'btn btn-white'}).on('change', function(event) {
-            let score = event.target.value;
-            let memberId = event.target.id.split('.')[0]
-            let systemId = event.target.id.split('.')[1]
+            let systemId = event.target.id.split('.')[0]
+            let memberId = event.target.id.split('.')[1]
+            let score = parseInt(event.target.value);
 
-            console.info(score + ' ' + memberId + ' ' + systemId);
+            Meteor.call('score.update', systemId, memberId, score);
         });
     }
 
@@ -147,7 +176,7 @@ class ScoreObj {
         });
     }
 
-    getScore(memberId, systemId) {
+    getScore(systemId, memberId) {
         if (this.scoreMap.get(memberId) && this.scoreMap.get(memberId).get(systemId)) {
             return this.scoreMap.get(memberId).get(systemId);
         }
