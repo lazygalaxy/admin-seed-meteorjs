@@ -29,7 +29,7 @@ Meteor.startup(function() {
             }, {
                 systemId: fields[0],
                 memberId: fields[1],
-                value: fields[2]
+                value: parseInt(fields[2])
             });
         }
     });

@@ -1,6 +1,7 @@
 //react
 import React from 'react';
 import 'jquery-knob'
+import 'bootstrap-touchspin'
 
 //meteor
 import {createContainer} from 'meteor/react-meteor-data';
@@ -15,6 +16,40 @@ import {SystemCollection} from '../../../imports/api/collections';
 import {TeamCollection} from '../../../imports/api/collections';
 
 class Matrix extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            lockEdit: true
+        };
+    }
+
+    //other functions
+    _toggleLockEdit() {
+        this.setState({
+            lockEdit: !this.state.lockEdit
+        });
+    }
+
+    _renderContent() {
+        return (
+            <div>
+                <div className="switch">
+                    Lock Edit
+                    <div className="onoffswitch">
+                        <input type="checkbox" id="globalLockEdit" checked={this.state.lockEdit} className="onoffswitch-checkbox" onClick={this._toggleLockEdit.bind(this)} readOnly/>
+                        <label className="onoffswitch-label" htmlFor="globalLockEdit">
+                            <span className="onoffswitch-inner"></span>
+                            <span className="onoffswitch-switch"></span>
+                        </label>
+                    </div>
+                </div>
+
+                {this._renderTables()}
+            </div>
+        )
+
+    }
+
     _renderTables() {
         return this.props.teams.map((team) => {
             return (
@@ -63,35 +98,38 @@ class Matrix extends React.Component {
 
     _renderScores(team, member) {
         let filteredSystems = this.props.systems.filter(system => system.teamId == team._id);
+
         return filteredSystems.map((system) => {
             let combinedId = system._id + '.' + member._id;
             let scoreValue = this.props.scoreObj.getScore(member._id, system._id);
 
             return (
                 <td key={combinedId}>
-                    <input className="dial" type="text" data-memberid={member._id} data-systemid={system._id} value={scoreValue} onChange={this._nothing.bind(this)} data-fgColor="#1AB394" data-min="0" data-max="5" data-width="65" data-height="65"/>
+                    <input className="touchspin" type="text" id={combinedId} value={scoreValue} onChange={this._nothing.bind(this)} disabled={this.state.lockEdit}/>
                 </td>
             );
         });
     }
 
     componentDidUpdate() {
-        $(".dial").knob({
-            'release': function(v) {
-                let memberId = this.$.attr('data-memberid');
-                let systemId = this.$.attr('data-systemid');
-                console.info('hello ' + memberId + ' ' + systemId + ' ' + v);
-            }
+        $(".touchspin").TouchSpin({min: 0, max: 5, buttondown_class: 'btn btn-white', buttonup_class: 'btn btn-white'}).on('change', function(event) {
+            let score = event.target.value;
+            let memberId = event.target.id.split('.')[0]
+            let systemId = event.target.id.split('.')[1]
+
+            console.info(score + ' ' + memberId + ' ' + systemId);
         });
     }
 
-    //used for input to avoid react warnings
-    _nothing() {}
+    //used for input to avoid react warnings with callbacks
+    _nothing() {
+        console.info('nothing happened!');
+    }
 
     render() {
         return (
             <Page title='Matrix'>
-                {this._renderTables()}
+                {this._renderContent()}
             </Page>
         )
     }
