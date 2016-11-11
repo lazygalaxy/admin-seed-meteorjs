@@ -36,7 +36,7 @@ export default React.createClass({
                 </Navigation>
 
                 <div id="page-wrapper" className="gray-bg">
-                    <NavBar></NavBar>
+                    {/* <NavBar></NavBar> */}
                     {this.props.children}
                     <Footer></Footer>
                 </div>
