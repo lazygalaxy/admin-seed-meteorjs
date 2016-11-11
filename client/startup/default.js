@@ -1,4 +1,5 @@
-// Run this when the meteor app is started
-Meteor.startup(function () {
+import {Accounts} from 'meteor/accounts-base';
 
+Meteor.startup(function() {
+    Accounts.ui.config({passwordSignupFields: 'USERNAME_ONLY'});
 });

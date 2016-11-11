@@ -5,16 +5,21 @@ import {ScoreCollection} from '../imports/api/collections';
 import {SystemCollection} from '../imports/api/collections';
 import {TeamCollection} from '../imports/api/collections';
 
-let memberId = 'v000053';
-let member = MemberCollection.findOne({_id: memberId});
-
 Meteor.startup(() => {
     Meteor.publish('members', function() {
-        return MemberCollection.find({
-            teams: {
-                $in: member.teams
-            }
-        });
+        if (this.userId) {
+            let member = MemberCollection.findOne({
+                _id: Meteor.users.findOne(this.userId).username
+            });
+            return MemberCollection.find({
+                teams: {
+                    $in: member.teams
+                }
+            });
+        } else {
+            this.ready();
+            return;
+        }
     });
 
     Meteor.publish('scores', function() {
@@ -33,19 +38,35 @@ Meteor.startup(() => {
     });
 
     Meteor.publish('systems', function() {
-        return SystemCollection.find({
-            teamId: {
-                $in: member.teams
-            }
-        });
+        if (this.userId) {
+            let member = MemberCollection.findOne({
+                _id: Meteor.users.findOne(this.userId).username
+            });
+            return SystemCollection.find({
+                teamId: {
+                    $in: member.teams
+                }
+            });
+        } else {
+            this.ready();
+            return;
+        }
     });
 
     Meteor.publish('teams', function() {
-        return TeamCollection.find({
-            _id: {
-                $in: member.teams
-            }
-        });
+        if (this.userId) {
+            let member = MemberCollection.findOne({
+                _id: Meteor.users.findOne(this.userId).username
+            });
+            return TeamCollection.find({
+                _id: {
+                    $in: member.teams
+                }
+            });
+        } else {
+            this.ready();
+            return;
+        }
     });
 });
 

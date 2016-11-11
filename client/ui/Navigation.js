@@ -1,4 +1,5 @@
 import React from 'react'
+import Accounts from './Accounts.js';
 
 export default class Navigation extends React.Component {
     render() {
@@ -14,33 +15,7 @@ export default class Navigation extends React.Component {
 
                     <ul className="nav" id="side-menu">
                         <li className="nav-header">
-                            <div className="dropdown profile-element">
-                                <a data-toggle="dropdown" className="dropdown-toggle" href="#">
-                                    <span className="clear">
-                                        <span className="block m-t-xs">
-                                            <strong className="font-bold">Example user</strong>
-                                        </span>
-                                        <span className="text-muted text-xs block">user
-                                            <b className="caret"></b>
-                                        </span>
-                                    </span>
-                                </a>
-                                <ul className="dropdown-menu animated fadeInRight m-t-xs">
-                                    <li>
-                                        <a href="#">Item</a>
-                                    </li>
-                                    <li>
-                                        <a href="#">Item</a>
-                                    </li>
-                                    <li className="divider"></li>
-                                    <li>
-                                        <a href="#">Item</a>
-                                    </li>
-                                </ul>
-                            </div>
-                            <div className="logo-element">
-                                IN+
-                            </div>
+                            <Accounts/>
                         </li>
                         {this.props.children}
                     </ul>
