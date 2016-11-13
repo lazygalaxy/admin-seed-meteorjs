@@ -14,7 +14,8 @@ Meteor.startup(function() {
             }, {
                 surname: fields[1],
                 name: fields[2],
-                teams: fields[3].split(':')
+                isAdmin: (fields[3] === "true"),
+                teams: fields[4].split(':')
             });
         }
     });

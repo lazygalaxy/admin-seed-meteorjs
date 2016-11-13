@@ -1,6 +1,6 @@
-epapa;Papakonstantis;Evangelos;ALPHA:GAMMA
-sbrin;Brin;Sergey;ALPHA
-lpage;Page;Larry;BETA
-ccook;Captain;Cook;GAMMA
-tnoah;Noah;Trevor;GAMMA
-lmesi;Mesi;Leo;BETA
+epapa;Papakonstantis;Evangelos;true;ALPHA:GAMMA
+sbrin;Brin;Sergey;true;ALPHA
+lpage;Page;Larry;false;BETA
+ccook;Captain;Cook;false;GAMMA
+tnoah;Noah;Trevor;false;GAMMA
+lmesi;Mesi;Leo;false;BETA

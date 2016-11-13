@@ -5,9 +5,10 @@ import cx from 'react-classset'
 //react components
 import Page from '../Page';
 
-// other libs
+//TODO: move the following in their own corresponding react components
 import 'jquery-knob'
 import 'bootstrap-touchspin'
+import 'toastr'
 
 //meteor
 import {createContainer} from 'meteor/react-meteor-data';
@@ -36,6 +37,7 @@ class Matrix extends React.Component {
     _renderContent() {
         return (
             <div>
+                {/* TODO: add switch to its own react component */}
                 <div className="switch">
                     Lock Edit
                     <div className="onoffswitch">
@@ -134,6 +136,7 @@ class Matrix extends React.Component {
 
             return (
                 <td key={combinedId}>
+                    {/* TODO: touchspin in its own react component */}
                     <input className="touchspin" type="text" id={combinedId} value={scoreValue} onChange={this._nothing.bind(this)} disabled={this.state.lockEdit}/>
                 </td>
             );
@@ -146,7 +149,15 @@ class Matrix extends React.Component {
             let memberId = event.target.id.split('.')[1]
             let score = parseInt(event.target.value);
 
-            Meteor.call('score.update', systemId, memberId, score);
+            Meteor.call('score.update', systemId, memberId, score, function(error, result) {
+                console.info(result + ' ' + error);
+                if (error) {
+                    toastr.error(error.reason);
+                }
+                if (result) {
+                    toastr.success(result, 'Some heading');
+                }
+            });
         });
     }
 
@@ -164,6 +175,7 @@ class Matrix extends React.Component {
     }
 }
 
+//TODO: score object could be placed in its own file
 class ScoreObj {
     constructor(scores) {
         this.scoreMap = new Map();
