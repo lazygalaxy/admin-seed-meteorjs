@@ -26,3 +26,4 @@ accounts-ui
 accounts-password
 blaze-html-templates
 babrahams:accounts-ldap
+chrismbeckett:toastr

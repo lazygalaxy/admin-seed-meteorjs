@@ -5,11 +5,6 @@ import cx from 'react-classset'
 //react components
 import Page from '../Page';
 
-//TODO: move the following in their own corresponding react components
-import 'jquery-knob'
-import 'bootstrap-touchspin'
-import 'toastr'
-
 //meteor
 import {createContainer} from 'meteor/react-meteor-data';
 
@@ -134,36 +129,37 @@ class Matrix extends React.Component {
             let combinedId = system._id + '.' + member._id;
             let scoreValue = this.props.scoreObj.getScore(system._id, member._id);
 
+            let style = {
+                width: '100%'
+            };
+
             return (
                 <td key={combinedId}>
-                    {/* TODO: touchspin in its own react component */}
-                    <input className="touchspin" type="text" id={combinedId} value={scoreValue} onChange={this._nothing.bind(this)} disabled={this.state.lockEdit}/>
+                    <input type='number' min='0' max='5' id={combinedId} value={scoreValue} onChange={this._scoreUpdate.bind(this)} style={style} disabled={this.state.lockEdit}/>
                 </td>
             );
         });
     }
 
-    componentDidUpdate() {
-        $(".touchspin").TouchSpin({min: 0, max: 5, buttondown_class: 'btn btn-white', buttonup_class: 'btn btn-white'}).on('change', function(event) {
-            let systemId = event.target.id.split('.')[0]
-            let memberId = event.target.id.split('.')[1]
-            let score = parseInt(event.target.value);
-
-            Meteor.call('score.update', systemId, memberId, score, function(error, result) {
-                console.info(result + ' ' + error);
-                if (error) {
-                    toastr.error(error.reason);
-                }
-                if (result) {
-                    toastr.success(result, 'Some heading');
-                }
-            });
-        });
-    }
-
     //used for input to avoid react warnings with callbacks
-    _nothing() {
-        console.info('nothing happened!');
+    _scoreUpdate(event) {
+        let score = parseInt(event.target.value) % 10;
+        if (score < 0 || score > 5) {
+            return false;
+        }
+
+        let systemId = event.target.id.split('.')[0]
+        let memberId = event.target.id.split('.')[1]
+
+        Meteor.call('score.update', systemId, memberId, score, function(error, result) {
+            console.info(result + ' ' + error);
+            if (error) {
+                toastr.error(error.reason);
+            }
+            if (result) {
+                toastr.success(result);
+            }
+        });
     }
 
     render() {
