@@ -5,6 +5,9 @@ import cx from 'react-classset'
 //react components
 import Page from '../Page';
 
+//other
+import Chart from 'chart.js';
+
 //meteor
 import {createContainer} from 'meteor/react-meteor-data';
 
@@ -51,6 +54,9 @@ class Matrix extends React.Component {
                     <div className="tab-content">
                         {this._renderTabContents()}
                     </div>
+                </div>
+                <div>
+                    <canvas id="radarChart"></canvas>
                 </div>
             </div>
         )
@@ -159,6 +165,60 @@ class Matrix extends React.Component {
             if (result) {
                 toastr.success(result);
             }
+        });
+    }
+
+    componentDidMount() {
+        var radarData = {
+            labels: [
+                "Eugene",
+                "Tobias",
+                "Norbert",
+                "Rainer",
+                "Roger",
+                "Evangelos",
+                "Torsten"
+            ],
+            datasets: [
+                {
+                    label: "ULLink",
+                    backgroundColor: "rgba(179,26,148,0.2)",
+                    borderColor: "rgba(179,26,148,1)",
+                    data: [
+                        5,
+                        4,
+                        1,
+                        3,
+                        0,
+                        5,
+                        2
+                    ]
+                }, {
+                    label: "Horizon",
+                    backgroundColor: "rgba(26,179,148,0.2)",
+                    borderColor: "rgba(26,179,148,1)",
+                    data: [
+                        1,
+                        3,
+                        5,
+                        0,
+                        0,
+                        3,
+                        4
+                    ]
+                }
+            ]
+        };
+
+        var radarOptions = {
+            responsive: true
+        };
+
+        var ctx5 = document.getElementById("radarChart").getContext("2d");
+        new Chart(ctx5, {
+            type: 'radar',
+            data: radarData,
+            options: radarOptions
         });
     }
 
