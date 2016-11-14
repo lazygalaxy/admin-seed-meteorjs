@@ -89,7 +89,7 @@ Meteor.methods({
                 memberId: memberId,
                 value: score
             });
-            return 'Score succesfully updated!';
+            return 'Score succesfully updated.';
         } else {
             //TODO: understand different error codes and their impact
             throw new Meteor.Error(500, "You have insufficient privileges to update scores.");

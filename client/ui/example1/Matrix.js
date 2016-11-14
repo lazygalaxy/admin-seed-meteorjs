@@ -43,6 +43,7 @@ class Matrix extends React.Component {
                         </label>
                     </div>
                 </div>
+
                 <div className="tabs-container">
                     <ul className="nav nav-tabs">
                         {this._renderTabTitles()}
@@ -152,7 +153,6 @@ class Matrix extends React.Component {
         let memberId = event.target.id.split('.')[1]
 
         Meteor.call('score.update', systemId, memberId, score, function(error, result) {
-            console.info(result + ' ' + error);
             if (error) {
                 toastr.error(error.reason);
             }
