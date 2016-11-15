@@ -7,6 +7,7 @@ import Page from '../Page';
 
 //other
 import Chart from 'chart.js';
+import 'peity'
 
 //meteor
 import {createContainer} from 'meteor/react-meteor-data';
@@ -100,6 +101,10 @@ class Matrix extends React.Component {
                             </thead>
                             <tbody>
                                 {this._renderTableRows(team)}
+                                <tr>
+                                    <td></td>
+                                    {this._renderTableCharts(team)}
+                                </tr>
                             </tbody>
                         </table>
                     </div>
@@ -125,6 +130,21 @@ class Matrix extends React.Component {
                     <td>{member.name}</td>
                     {this._renderScores(team, member)}
                 </tr>
+            );
+        });
+    }
+
+    _renderTableCharts(team) {
+        let filteredSystems = this.props.systems.filter(system => system.teamId == team._id);
+        return filteredSystems.map((system) => {
+            let filteredMembers = this.props.members.filter(member => member.teams.indexOf(team._id) != -1);
+            let data = filteredMembers.map((member) => {
+                return this.props.scoreObj.getScore(system._id, member._id);
+            });
+            return (
+                <td key={system._id}>
+                    <span className="pie">{data.join()}</span>
+                </td>
             );
         });
     }
@@ -166,6 +186,16 @@ class Matrix extends React.Component {
                 toastr.success(result);
             }
         });
+    }
+
+    componentDidUpdate() {
+        $("span.pie").peity("pie", {
+            radius: 40,
+            fill: function(_, i, all) {
+                var hue = parseInt((i / all.length) * 360)
+                return "hsl(" + hue + ",100%,50%)"
+            }
+        })
     }
 
     componentDidMount() {
