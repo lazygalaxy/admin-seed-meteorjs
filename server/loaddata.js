@@ -20,21 +20,6 @@ Meteor.startup(function() {
         }
     });
 
-    var scoreAssets = Assets.getText('vb_scores.csv').split(/\r\n|\n/);
-    console.info('updating scores: ' + scoreAssets.length);
-    scoreAssets.forEach(function(entry) {
-        if (entry) {
-            var fields = entry.split(';');
-            ScoreCollection.upsert({
-                _id: fields[0] + '_' + fields[1]
-            }, {
-                systemId: fields[0],
-                memberId: fields[1],
-                value: parseInt(fields[2])
-            });
-        }
-    });
-
     var systemAssets = Assets.getText('vb_systems.csv').split(/\r\n|\n/);
     console.info('updating systems: ' + systemAssets.length);
     systemAssets.forEach(function(entry) {

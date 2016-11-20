@@ -151,6 +151,7 @@ class Matrix extends React.Component {
 
     _renderScores(team, member) {
         let filteredSystems = this.props.systems.filter(system => system.teamId == team._id);
+        let width = String(100 / filteredSystems.length) + '%';
 
         return filteredSystems.map((system) => {
             let combinedId = system._id + '.' + member._id;
@@ -160,9 +161,50 @@ class Matrix extends React.Component {
                 width: '100%'
             };
 
+            let attr = [];
+            attr.push('btn');
+            attr.push('dropdown-toggle');
+            attr.push('btn-block');
+
+            switch (scoreValue) {
+                case 4:
+                case 3:
+                    attr.push('btn-warning');
+                    break;
+                case 2:
+                case 1:
+                    attr.push('btn-info');
+                    break;
+                default:
+                    attr.push('btn-default');
+            }
+
             return (
-                <td key={combinedId}>
-                    <input type='number' min='0' max='5' id={combinedId} value={scoreValue} onChange={this._scoreUpdate.bind(this)} style={style} disabled={this.state.lockEdit}/>
+                <td width={width} key={combinedId}>
+                    {/* <input type='number' min='0' max='4' id={combinedId} value={scoreValue} onChange={this._scoreUpdate.bind(this)} style={style} disabled={this.state.lockEdit}/> */}
+
+                    <div className="dropdown">
+                        <button className={cx(...attr)} type="button" id="dropdownMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            {this._scoreToLabel(scoreValue)}&nbsp;<span className="caret"></span>
+                        </button>
+                        <ul className="dropdown-menu" aria-labelledby="dropdownMenu">
+                            <li>
+                                <a id={combinedId} onClick={this._scoreUpdate.bind(this)} href="#">{this._scoreToLabel(4)}</a>
+                            </li>
+                            <li>
+                                <a id={combinedId} onClick={this._scoreUpdate.bind(this)} href="#">{this._scoreToLabel(3)}</a>
+                            </li>
+                            <li>
+                                <a id={combinedId} onClick={this._scoreUpdate.bind(this)} href="#">{this._scoreToLabel(2)}</a>
+                            </li>
+                            <li>
+                                <a id={combinedId} onClick={this._scoreUpdate.bind(this)} href="#">{this._scoreToLabel(1)}</a>
+                            </li>
+                            <li>
+                                <a id={combinedId} onClick={this._scoreUpdate.bind(this)} href="#">{this._scoreToLabel(0)}</a>
+                            </li>
+                        </ul>
+                    </div>
                 </td>
             );
         });
@@ -170,10 +212,7 @@ class Matrix extends React.Component {
 
     //used for input to avoid react warnings with callbacks
     _scoreUpdate(event) {
-        let score = parseInt(event.target.value) % 10;
-        if (score < 0 || score > 5) {
-            return false;
-        }
+        let score = this._labelToScore(event.target.text)
 
         let systemId = event.target.id.split('.')[0]
         let memberId = event.target.id.split('.')[1]
@@ -188,14 +227,53 @@ class Matrix extends React.Component {
         });
     }
 
+    _labelToScore(score) {
+        switch (score) {
+            case 'Lead':
+                return 4;
+            case 'Deputy':
+                return 3;
+            case 'Change/Run':
+                return 2;
+            case 'Run':
+                return 1;
+        }
+        return 0;
+    }
+
+    _scoreToLabel(score) {
+        switch (score) {
+            case 4:
+                return 'Lead';
+            case 3:
+                return 'Deputy';
+            case 2:
+                return 'Change/Run';
+            case 1:
+                return 'Run';
+        }
+        return 'None';
+    }
+
     componentDidUpdate() {
         $("span.pie").peity("pie", {
             radius: 40,
-            fill: function(_, i, all) {
-                var hue = parseInt((i / all.length) * 360)
-                return "hsl(" + hue + ",100%,50%)"
-            }
-        })
+            // fill: function(_, i, all) {
+            //     var hue = parseInt(i * (360 / all.length));
+            //     return "hsl(" + hue + ",100%,50%)"
+            // }
+            fill: [
+                "rgb(255, 0, 0)",
+                "rgb(0, 255, 0)",
+                "rgb(0, 0, 255)",
+                "rgb(255, 255, 0)",
+                "rgb(255, 0, 255)",
+                "rgb(0, 255, 255)",
+                "rgb(127, 0, 0)",
+                "rgb(0, 127, 0)",
+                "rgb(0, 0, 127)"
+            ]
+        });
     }
 
     componentDidMount() {
