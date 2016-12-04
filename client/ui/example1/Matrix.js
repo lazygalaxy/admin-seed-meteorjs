@@ -96,6 +96,7 @@ class Matrix extends React.Component {
                             <thead>
                                 <tr>
                                     <th></th>
+                                    <th></th>
                                     {this._renderTableHeaders(team)}
                                 </tr>
                             </thead>
@@ -103,18 +104,20 @@ class Matrix extends React.Component {
                                 {this._renderTableRows(team)}
                                 <tr>
                                     <td></td>
+                                    <td></td>
                                     {this._renderTableCharts(team)}
                                 </tr>
                             </tbody>
                         </table>
                     </div>
+                    {this._renderInfo(team)}
                 </div>
             );
         });
     }
 
     _renderTableHeaders(team) {
-        let filteredSystems = this.props.systems.filter(system => system.teamId == team._id);
+        let filteredSystems = this.props.systemObj.systems.filter(system => system.teamId == team._id);
         return filteredSystems.map((system) => {
             return (
                 <th key={system._id}>{system.label}</th>
@@ -125,17 +128,82 @@ class Matrix extends React.Component {
     _renderTableRows(team) {
         let filteredMembers = this.props.members.filter(member => member.teams.indexOf(team._id) != -1);
         return filteredMembers.map((member) => {
+            let combinedId = '#' + team._id + '_' + member._id;
             return (
                 <tr key={member._id}>
-                    <td>{member.name}</td>
+                    <td>
+                        {member.name}
+                    </td>
+                    <td>
+                        <button type="button" className="btn btn-primary btn-sm" data-toggle="modal" data-target={combinedId}>
+                            <i className="fa fa-info"></i>
+                        </button>
+                    </td>
                     {this._renderScores(team, member)}
                 </tr>
             );
         });
     }
 
+    _readableArray(array) {
+        if (array.length == 0) {
+            return null;
+        }
+        if (array.length == 1) {
+            return array[0].label;
+        }
+
+        let returnString = array[0].label;
+        for (var i = 1; i < array.length; i++) {
+            returnString = returnString + ', ' + array[i].label;
+        }
+
+        return returnString;
+    }
+
+    _renderInfo(team) {
+        let filteredMembers = this.props.members.filter(member => member.teams.indexOf(team._id) != -1);
+        return filteredMembers.map((member) => {
+            let combinedId = team._id + '_' + member._id;
+
+            let leadSystems = this.props.scoreObj.getSystems(4, member._id);
+            let deputySystems = this.props.scoreObj.getSystems(3, member._id);
+            let changeRunSystems = this.props.scoreObj.getSystems(2, member._id);
+            let runSystems = leadSystems.concat(deputySystems).concat(changeRunSystems).concat(this.props.scoreObj.getSystems(1, member._id));
+
+            return (
+                <div key={combinedId} id={combinedId} className="modal fade" role="dialog">
+
+                    <div className="modal-dialog">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <button type="button" className="close" data-dismiss="modal">&times;</button>
+                                <h4 className="modal-title">{member.name} {member.surname}</h4>
+                            </div>
+                            <div className="modal-body">
+                                <h4>Change The Bank</h4>
+                                {leadSystems.length > 0 && <div>
+                                    <p>Take a leading role in changing the bank with regards to {this._readableArray(leadSystems)}
+                                        &nbsp;and all underlying systems and components.</p>
+                                </div>}
+                                <h4>Run The Bank</h4>
+                                {runSystems.length > 0 && <div>
+                                    <p>Be involved in the weekly rotation system as a Scitman in running the bank and supporting the {this._readableArray(runSystems)}
+                                        &nbsp;and all underlying systems and components.</p>
+                                </div>}
+                            </div>
+                            <div className="modal-footer">
+                                <button type="button" className="btn btn-default" data-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        });
+    }
+
     _renderTableCharts(team) {
-        let filteredSystems = this.props.systems.filter(system => system.teamId == team._id);
+        let filteredSystems = this.props.systemObj.systems.filter(system => system.teamId == team._id);
         return filteredSystems.map((system) => {
             let filteredMembers = this.props.members.filter(member => member.teams.indexOf(team._id) != -1);
             let data = filteredMembers.map((member) => {
@@ -150,7 +218,7 @@ class Matrix extends React.Component {
     }
 
     _renderScores(team, member) {
-        let filteredSystems = this.props.systems.filter(system => system.teamId == team._id);
+        let filteredSystems = this.props.systemObj.systems.filter(system => system.teamId == team._id);
         let width = String(100 / filteredSystems.length) + '%';
 
         return filteredSystems.map((system) => {
@@ -341,7 +409,8 @@ class Matrix extends React.Component {
 
 //TODO: score object could be placed in its own file
 class ScoreObj {
-    constructor(scores) {
+    constructor(scores, systemObj) {
+        this.systemObj = systemObj;
         this.scoreMap = new Map();
 
         scores.map((score) => {
@@ -358,6 +427,34 @@ class ScoreObj {
         }
         return 0;
     }
+
+    getSystems(scoreMatch, memberId) {
+        var systemObj = this.systemObj;
+        let systems = []
+        if (this.scoreMap.get(memberId)) {
+            this.scoreMap.get(memberId).forEach(function(score, systemId) {
+                if (systemObj.getSystem(systemId) && scoreMatch == score) {
+                    systems.push(systemObj.getSystem(systemId));
+                }
+            });
+        }
+        return systems;
+    }
+}
+
+class SystemObj {
+    constructor(systems) {
+        this.systems = systems;
+        this.systemMap = new Map();
+
+        systems.map((system) => {
+            this.systemMap.set(system._id, system);
+        });
+    }
+
+    getSystem(systemId) {
+        return this.systemMap.get(systemId);
+    }
 }
 
 export default createContainer(() => {
@@ -366,22 +463,21 @@ export default createContainer(() => {
     Meteor.subscribe('scores');
     Meteor.subscribe('teams');
 
-    return {
-        scoreObj: new ScoreObj(ScoreCollection.find({}).fetch()),
-        systems: SystemCollection.find({}, {
-            sort: {
-                label: 1
-            }
-        }).fetch(),
-        members: MemberCollection.find({}, {
+    let systemObj = new SystemObj(SystemCollection.find({}, {
+        sort: {
+            label: 1
+        }
+    }).fetch());
+
+    let scoreObj = new ScoreObj(ScoreCollection.find({}).fetch(), systemObj);
+
+    return {scoreObj: scoreObj, systemObj: systemObj, members: MemberCollection.find({}, {
             sort: {
                 name: 1
             }
-        }).fetch(),
-        teams: TeamCollection.find({}, {
+        }).fetch(), teams: TeamCollection.find({}, {
             sort: {
                 label: 1
             }
-        }).fetch()
-    };
+        }).fetch()};
 }, Matrix);
