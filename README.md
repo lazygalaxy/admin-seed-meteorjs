@@ -1,0 +1,1 @@
+LazyGalaxy MeteorJS Seed Project

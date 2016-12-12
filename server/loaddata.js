@@ -4,7 +4,7 @@ import {SystemCollection} from '../imports/api/collections';
 import {TeamCollection} from '../imports/api/collections';
 
 Meteor.startup(function() {
-    var memberAssets = Assets.getText('vb_members.csv').split(/\r\n|\n/);
+    var memberAssets = Assets.getText('members.csv').split(/\r\n|\n/);
     console.info('updating members: ' + memberAssets.length);
     memberAssets.forEach(function(entry) {
         if (entry) {
@@ -20,7 +20,7 @@ Meteor.startup(function() {
         }
     });
 
-    var systemAssets = Assets.getText('vb_systems.csv').split(/\r\n|\n/);
+    var systemAssets = Assets.getText('systems.csv').split(/\r\n|\n/);
     console.info('updating systems: ' + systemAssets.length);
     systemAssets.forEach(function(entry) {
         if (entry) {
@@ -34,7 +34,7 @@ Meteor.startup(function() {
         }
     });
 
-    var teamAssets = Assets.getText('vb_teams.csv').split(/\r\n|\n/);
+    var teamAssets = Assets.getText('teams.csv').split(/\r\n|\n/);
     console.info('updating teams: ' + teamAssets.length);
     teamAssets.forEach(function(entry) {
         if (entry) {
